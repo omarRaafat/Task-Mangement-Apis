@@ -1,8 +1,8 @@
-# 🚀 Task Management System API
+#  Task Management System API
 
 A robust Laravel-based REST API for comprehensive task management with advanced features including user authentication, task assignment, commenting system, and real-time email notifications.
 
-## ✨ Features
+##  Features
 
 - **🔐 Secure Authentication** - Token-based authentication with Laravel Sanctum
 - **📋 Task Management** - Complete CRUD operations for tasks with assignment capabilities
@@ -13,16 +13,16 @@ A robust Laravel-based REST API for comprehensive task management with advanced 
 - **🧪 Comprehensive Testing** - Full test coverage with feature and unit tests
 - **📚 API Documentation** - Interactive Swagger UI and Postman collection
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
-- **Backend**: Laravel 11 (PHP 8.2+)
+- **Backend**: Laravel 12 (PHP 8.2+)
 - **Database**: MySQL 8.0+
 - **Cache**: Redis 6.0+
 - **Queue**: Database/Redis
 - **Authentication**: Laravel Sanctum
 - **Documentation**: Swagger/OpenAPI 3.0
 
-## 📋 Prerequisites
+##  Prerequisites
 
 - **PHP 8.2+** with extensions: BCMath, Ctype, cURL, DOM, Fileinfo, JSON, Mbstring, OpenSSL, PCRE, PDO, Tokenizer, XML
 - **Composer** 2.0+
@@ -30,9 +30,9 @@ A robust Laravel-based REST API for comprehensive task management with advanced 
 - **Redis** 6.0+ (optional, for caching and queues)
 - **Git** for version control
 
-## 🚀 Quick Start
+##  Quick Start
 
-### **📥 Installation**
+### ** Installation**
 
 ```bash
 # Clone the repository
@@ -153,7 +153,7 @@ MAIL_FROM_NAME="Task Management System"
 3. ✅ **Dependencies Installed** - Run `composer install`
 4. ✅ **Application Key Generated** - Run `php artisan key:generate`
 
-### **🚀 Start the Application**
+### ** Start the Application**
 
 ```bash
 # 1. Run database migrations and seeders
@@ -169,17 +169,17 @@ php artisan queue:work
 redis-server
 ```
 
-### **🌐 Access Points**
+### ** Access Points**
 
 - **API Base URL**: `http://127.0.0.1:8000`
 - **Interactive Documentation**: `http://127.0.0.1:8000/api/docs`
 - **API JSON Spec**: `http://127.0.0.1:8000/api/documentation`
 
-## 🔐 Authentication
+##  Authentication
 
 The API uses **Laravel Sanctum** for token-based authentication. All protected routes require a Bearer token in the Authorization header.
 
-### **🔑 Authentication Flow**
+### ** Authentication Flow**
 
 1. **Register** a new user account
 2. **Login** to obtain an access token
@@ -195,7 +195,7 @@ The API uses **Laravel Sanctum** for token-based authentication. All protected r
 | `GET` | `/api/user` | Get current user profile | ✅ Yes |
 | `POST` | `/api/logout` | Logout and revoke token | ✅ Yes |
 
-### **💻 Example Usage (PowerShell)**
+### ** Example Usage (PowerShell)**
 
 ```powershell
 # 1. Register a new user
@@ -223,7 +223,7 @@ $headers = @{ Authorization = "Bearer $accessToken" }
 $tasks = Invoke-RestMethod -Method Get -Uri "http://127.0.0.1:8000/api/tasks" -Headers $headers
 ```
 
-## 📚 API Overview
+## API Overview
 
 ### **📋 Task Management Endpoints**
 
@@ -291,7 +291,7 @@ MAIL_PASSWORD=your-app-password
 MAIL_ENCRYPTION=tls
 ```
 
-### **🚀 Queue Commands**
+### ** Queue Commands**
 
 ```bash
 # Process all queued jobs
@@ -309,7 +309,7 @@ php artisan queue:flush
 
 ## 🧪 **API Testing**
 
-### **🚀 Quick Testing with Postman**
+### ** Quick Testing with Postman**
 
 #### **📥 Import the Postman Collection:**
 
