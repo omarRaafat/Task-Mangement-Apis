@@ -222,7 +222,7 @@ class DocumentationController extends Controller
                                         'properties' => [
                                             'title' => ['type' => 'string', 'example' => 'API Test Task'],
                                             'description' => ['type' => 'string', 'example' => 'This is a test task created via API'],
-                                            'status' => ['type' => 'string', 'enum' => ['pending', 'in_progress', 'completed'], 'example' => 'pending'],
+                                            'status' => ['type' => 'string', 'enum' => ['pending', 'in-progress', 'completed'], 'example' => 'pending'],
                                             'assigned_to' => ['type' => 'integer', 'example' => 15]
                                         ]
                                     ]
@@ -314,7 +314,7 @@ class DocumentationController extends Controller
                                         'properties' => [
                                             'title' => ['type' => 'string', 'example' => 'This is a test task created via API'],
                                             'description' => ['type' => 'string', 'example' => 'This is a test task created via API'],
-                                            'status' => ['type' => 'string', 'enum' => ['pending', 'in_progress', 'completed'], 'example' => 'in_progress'],
+                                            'status' => ['type' => 'string', 'enum' => ['pending', 'in-progress', 'completed'], 'example' => 'in-progress'],
                                             'assigned_to' => ['type' => 'integer', 'example' => 1],
                                             'due_date' => ['type' => 'date', 'example' => '2025-12-31']
                                         ]

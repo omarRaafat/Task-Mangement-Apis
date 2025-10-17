@@ -22,16 +22,23 @@ class TaskRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'status' => [
-                'required',
-                Rule::in(['pending', 'in-progress', 'completed'])
-            ],
+            'status' => 'required|in:pending,in-progress,completed',
             'due_date' => 'required|date|after:today',
-            'assigned_to' => 'nullable|exists:users,id',
+            'assigned_to' => 'required|exists:users,id',
         ];
+    
+        // For update, make fields optional
+        if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
+            $rules['title'] = 'sometimes|string|max:255';
+            $rules['description'] = 'sometimes|string';
+            $rules['due_date'] = 'sometimes|date|after:today';
+            $rules['assigned_to'] = 'sometimes|exists:users,id';
+        }
+    
+        return $rules;
     }
 
     /**
