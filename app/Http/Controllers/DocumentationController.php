@@ -194,7 +194,7 @@ class DocumentationController extends Controller
                                                 'properties' => [
                                                     'id' => ['type' => 'integer', 'example' => 1],
                                                     'title' => ['type' => 'string', 'example' => 'Implement user authentication system'],
-                                                    'description' => ['type' => 'string', 'example' => 'Create a secure authentication system with JWT tokens, password hashing, and user registration/login functionality'],
+                                                    'description' => ['type' => 'string', 'example' => 'This is a test task created via API'],
                                                     'status' => ['type' => 'string', 'example' => 'pending'],
                                                     'user_id' => ['type' => 'integer', 'example' => 1],
                                                     'assigned_to' => ['type' => 'integer', 'example' => 15],
@@ -220,8 +220,8 @@ class DocumentationController extends Controller
                                         'type' => 'object',
                                         'required' => ['title', 'description'],
                                         'properties' => [
-                                            'title' => ['type' => 'string', 'example' => 'Design database schema for task management'],
-                                            'description' => ['type' => 'string', 'example' => 'Create a secure authentication system with JWT tokens, password hashing, and user registration/login functionality'],
+                                            'title' => ['type' => 'string', 'example' => 'API Test Task'],
+                                            'description' => ['type' => 'string', 'example' => 'This is a test task created via API'],
                                             'status' => ['type' => 'string', 'enum' => ['pending', 'in_progress', 'completed'], 'example' => 'pending'],
                                             'assigned_to' => ['type' => 'integer', 'example' => 15]
                                         ]
@@ -238,8 +238,8 @@ class DocumentationController extends Controller
                                             'type' => 'object',
                                             'properties' => [
                                                 'id' => ['type' => 'integer', 'example' => 1],
-                                                'title' => ['type' => 'string', 'example' => 'Design database schema for task management'],
-                                                'description' => ['type' => 'string', 'example' => 'Create a secure authentication system with JWT tokens, password hashing, and user registration/login functionality'],
+                                                'title' => ['type' => 'string', 'example' => 'API Test Task'],
+                                                'description' => ['type' => 'string', 'example' => 'This is a test task created via API'],
                                                 'status' => ['type' => 'string', 'example' => 'pending'],
                                                 'user_id' => ['type' => 'integer', 'example' => 1],
                                                 'assigned_to' => ['type' => 'integer', 'example' => 15],
@@ -278,7 +278,7 @@ class DocumentationController extends Controller
                                             'properties' => [
                                                 'id' => ['type' => 'integer', 'example' => 1],
                                                 'title' => ['type' => 'string', 'example' => 'Implement user authentication system'],
-                                                'description' => ['type' => 'string', 'example' => 'Create a secure authentication system with JWT tokens, password hashing, and user registration/login functionality'],
+                                                'description' => ['type' => 'string', 'example' => 'This is a test task created via API'],
                                                 'status' => ['type' => 'string', 'example' => 'pending'],
                                                 'user_id' => ['type' => 'integer', 'example' => 1],
                                                 'assigned_to' => ['type' => 'integer', 'example' => 15],
@@ -312,10 +312,11 @@ class DocumentationController extends Controller
                                     'schema' => [
                                         'type' => 'object',
                                         'properties' => [
-                                            'title' => ['type' => 'string', 'example' => 'Update API documentation'],
-                                            'description' => ['type' => 'string', 'example' => 'Update the API documentation with comprehensive examples and proper error handling'],
+                                            'title' => ['type' => 'string', 'example' => 'This is a test task created via API'],
+                                            'description' => ['type' => 'string', 'example' => 'This is a test task created via API'],
                                             'status' => ['type' => 'string', 'enum' => ['pending', 'in_progress', 'completed'], 'example' => 'in_progress'],
-                                            'assigned_to' => ['type' => 'integer', 'example' => 15]
+                                            'assigned_to' => ['type' => 'integer', 'example' => 1],
+                                            'due_date' => ['type' => 'date', 'example' => '2025-12-31']
                                         ]
                                     ]
                                 ]
@@ -389,7 +390,7 @@ class DocumentationController extends Controller
                                                 'properties' => [
                                                     'id' => ['type' => 'integer', 'example' => 1],
                                                     'title' => ['type' => 'string', 'example' => 'Review code quality and performance'],
-                                                    'description' => ['type' => 'string', 'example' => 'Create a secure authentication system with JWT tokens, password hashing, and user registration/login functionality'],
+                                                    'description' => ['type' => 'string', 'example' => 'This is a test task created via API'],
                                                     'status' => ['type' => 'string', 'example' => 'pending'],
                                                     'user_id' => ['type' => 'integer', 'example' => 1],
                                                     'assigned_to' => ['type' => 'integer', 'example' => 15],
@@ -421,7 +422,7 @@ class DocumentationController extends Controller
                                                 'properties' => [
                                                     'id' => ['type' => 'integer', 'example' => 1],
                                                     'title' => ['type' => 'string', 'example' => 'Fix critical security vulnerabilities'],
-                                                    'description' => ['type' => 'string', 'example' => 'Create a secure authentication system with JWT tokens, password hashing, and user registration/login functionality'],
+                                                    'description' => ['type' => 'string', 'example' => 'This is a test task created via API'],
                                                     'status' => ['type' => 'string', 'example' => 'pending'],
                                                     'user_id' => ['type' => 'integer', 'example' => 1],
                                                     'assigned_to' => ['type' => 'integer', 'example' => 15],
@@ -461,7 +462,7 @@ class DocumentationController extends Controller
                                                 'type' => 'object',
                                                 'properties' => [
                                                     'id' => ['type' => 'integer', 'example' => 1],
-                                                    'content' => ['type' => 'string', 'example' => 'Great progress on the authentication system! The JWT implementation looks solid.'],
+                                                    'content' => ['type' => 'string', 'example' => 'This is a test comment via API.'],
                                                     'task_id' => ['type' => 'integer', 'example' => 1],
                                                     'user_id' => ['type' => 'integer', 'example' => 1],
                                                     'created_at' => ['type' => 'string', 'format' => 'date-time'],
@@ -504,7 +505,7 @@ class DocumentationController extends Controller
                                         'type' => 'object',
                                         'required' => ['content'],
                                         'properties' => [
-                                            'content' => ['type' => 'string', 'example' => 'Great progress on the authentication system! The JWT implementation looks solid.']
+                                            'content' => ['type' => 'string', 'example' => 'This is a test comment via API.']
                                         ]
                                     ]
                                 ]
@@ -519,7 +520,7 @@ class DocumentationController extends Controller
                                             'type' => 'object',
                                             'properties' => [
                                                 'id' => ['type' => 'integer', 'example' => 1],
-                                                'content' => ['type' => 'string', 'example' => 'Great progress on the authentication system! The JWT implementation looks solid.'],
+                                                'content' => ['type' => 'string', 'example' => 'This is a test comment via API.'],
                                                 'task_id' => ['type' => 'integer', 'example' => 1],
                                                 'user_id' => ['type' => 'integer', 'example' => 1],
                                                 'created_at' => ['type' => 'string', 'format' => 'date-time'],
@@ -563,7 +564,7 @@ class DocumentationController extends Controller
                                         'type' => 'object',
                                         'required' => ['content'],
                                         'properties' => [
-                                            'content' => ['type' => 'string', 'example' => 'Please also add rate limiting to prevent brute force attacks on the login endpoint.']
+                                            'content' => ['type' => 'string', 'example' => 'This is a test comment via API.']
                                         ]
                                     ]
                                 ]
