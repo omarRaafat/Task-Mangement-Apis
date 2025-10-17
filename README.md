@@ -1,163 +1,311 @@
-# Task Management System API
+# 🚀 Task Management System API
 
-Laravel-based API for managing tasks and comments with token authentication, caching, and queued notifications.
+A robust Laravel-based REST API for comprehensive task management with advanced features including user authentication, task assignment, commenting system, and real-time email notifications.
 
-## Features
+## ✨ Features
 
-- Authentication (token-based register/login, Bearer tokens)
-- Task CRUD and listing of own/assigned tasks
-- Commenting on tasks
-- Email notifications dispatched via queue on new comments
-- Caching of frequently read data
-- Repository pattern and request validation
-- Feature tests
+- **🔐 Secure Authentication** - Token-based authentication with Laravel Sanctum
+- **📋 Task Management** - Complete CRUD operations for tasks with assignment capabilities
+- **💬 Comment System** - Real-time commenting on tasks with user notifications
+- **📧 Email Notifications** - Automated email notifications via queued jobs
+- **⚡ Performance Optimized** - Redis caching for improved response times
+- **🏗️ Clean Architecture** - Repository pattern with proper request validation
+- **🧪 Comprehensive Testing** - Full test coverage with feature and unit tests
+- **📚 API Documentation** - Interactive Swagger UI and Postman collection
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-- Laravel 12 (PHP 8.4+)
-- MySQL
-- Queue: database (default)
-- Cache:  Redis
+- **Backend**: Laravel 11 (PHP 8.2+)
+- **Database**: MySQL 8.0+
+- **Cache**: Redis 6.0+
+- **Queue**: Database/Redis
+- **Authentication**: Laravel Sanctum
+- **Documentation**: Swagger/OpenAPI 3.0
 
-## Prerequisites
+## 📋 Prerequisites
 
-- PHP 8.4+
-- Composer
-- Git
-- Node.js 18+ (only if you plan to use Vite/dev assets; not required for API)
+- **PHP 8.2+** with extensions: BCMath, Ctype, cURL, DOM, Fileinfo, JSON, Mbstring, OpenSSL, PCRE, PDO, Tokenizer, XML
+- **Composer** 2.0+
+- **MySQL** 8.0+ or **MariaDB** 10.3+
+- **Redis** 6.0+ (optional, for caching and queues)
+- **Git** for version control
 
-## Quick Start (Windows PowerShell)
+## 🚀 Quick Start
 
-```powershell
-# Clone
-git clone Task-Mangement-App
-cd Task-Mangement-App
+### **📥 Installation**
+
+```bash
+# Clone the repository
+git clone <your-repo-url> Task-Management-App
+cd Task-Management-App
 
 # Install PHP dependencies
 composer install
 
-# Copy environment and generate app key
+# Copy environment file and generate application key
 cp .env.example .env
 php artisan key:generate
+```
 
-# Use SQLite by default (recommended for local):
-# Ensure database file exists
-New-Item -ItemType File -Path .\database\database.sqlite -Force | Out-Null
+### **🗄️ Database Setup**
 
-# Update .env (see next section) then run migrations and seeders
-php artisan migrate --seed
+1. **Create MySQL Database:**
+   ```sql
+   CREATE DATABASE task_management_db;
+   ```
 
-# Serve the API
+2. **Configure Environment Variables** (see Environment Configuration section below)
+
+3. **Run Migrations and Seeders:**
+   ```bash
+   php artisan migrate --seed
+   ```
+
+### **🏃‍♂️ Running the Application**
+
+```bash
+# Start the development server
 php artisan serve
 
 # In another terminal, start the queue worker (for email notifications)
 php artisan queue:work
 ```
 
-The API will be available at `http://127.0.0.1:8000`.
+**🌐 API Base URL:** `http://127.0.0.1:8000`
 
-## Environment Configuration
+## ⚙️ Environment Configuration
 
-Minimal `.env` for local development using SQLite and queued notifications stored in the database:
+### **📝 Required Environment Variables**
+
+Create a `.env` file in the project root with the following configuration:
 
 ```env
+# Application Settings
 APP_NAME="Task Management API"
 APP_ENV=local
-APP_KEY=
+APP_KEY=base64:your-generated-key-here
 APP_DEBUG=true
 APP_URL=http://127.0.0.1:8000
 
+# Logging
 LOG_CHANNEL=stack
 
-# Database (SQLite)
-DB_CONNECTION=sqlite
-DB_DATABASE=database/database.sqlite
+# Database Configuration (MySQL)
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=task_management_db
+DB_USERNAME=your_mysql_username
+DB_PASSWORD=your_mysql_password
 
-# Cache & Queue
+# Cache Configuration
+CACHE_DRIVER=redis
+CACHE_PREFIX=task_management
+
+# Queue Configuration
+QUEUE_CONNECTION=redis
+
+# Session Configuration
+SESSION_DRIVER=redis
+SESSION_LIFETIME=120
+
+# Redis Configuration
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
+
+# Mail Configuration (for notifications)
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="noreply@taskmanagement.com"
+MAIL_FROM_NAME="Task Management System"
+
+# Sanctum Configuration
+SANCTUM_STATEFUL_DOMAINS=localhost,127.0.0.1,127.0.0.1:8000,::1
+```
+
+### **🔧 Alternative Configuration (File-based)**
+
+If you prefer file-based caching and database queues (no Redis required):
+
+```env
+# Cache & Queue (File-based)
 CACHE_DRIVER=file
 QUEUE_CONNECTION=database
 SESSION_DRIVER=file
 
-# Mail (use log for local so emails are written to storage/logs/laravel.log)
+# Mail (Log-based for development)
 MAIL_MAILER=log
-MAIL_FROM_ADDRESS="no-reply@example.test"
-MAIL_FROM_NAME="Task Management API"
-
-# If you prefer Redis for cache/queue, set:
-# CACHE_DRIVER=redis
-# QUEUE_CONNECTION=redis
-# REDIS_HOST=127.0.0.1
-# REDIS_PORT=6379
+MAIL_FROM_ADDRESS="noreply@taskmanagement.com"
+MAIL_FROM_NAME="Task Management System"
 ```
 
-If you prefer MySQL/PostgreSQL, set `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` accordingly and remove the SQLite settings.
+## 🏃‍♂️ Running the Application
 
-## Running the Application
+### **📋 Pre-flight Checklist**
 
-1. Ensure `.env` is configured and the database exists.
-2. Run database migrations (and seeders if desired):
-   ```bash
-   php artisan migrate --seed
-   ```
-3. Start the development server:
-   ```bash
-   php artisan serve
-   ```
-4. In a separate terminal, start the queue worker to process notifications:
-   ```bash
-   php artisan queue:work
-   ```
+1. ✅ **Database Created** - Ensure MySQL database `task_management_db` exists
+2. ✅ **Environment Configured** - `.env` file is properly set up
+3. ✅ **Dependencies Installed** - Run `composer install`
+4. ✅ **Application Key Generated** - Run `php artisan key:generate`
 
-## Authentication
+### **🚀 Start the Application**
 
-Use the public endpoints to obtain a token, then include it as `Authorization: Bearer <token>` for all protected routes.
+```bash
+# 1. Run database migrations and seeders
+php artisan migrate --seed
 
-- `POST /api/register` – create a user
-- `POST /api/login` – obtain an access token
+# 2. Start the development server
+php artisan serve
 
-Example (PowerShell using `Invoke-RestMethod`):
+# 3. In another terminal, start the queue worker (for email notifications)
+php artisan queue:work
+
+# 4. Optional: Start Redis server (if using Redis for cache/queues)
+redis-server
+```
+
+### **🌐 Access Points**
+
+- **API Base URL**: `http://127.0.0.1:8000`
+- **Interactive Documentation**: `http://127.0.0.1:8000/api/docs`
+- **API JSON Spec**: `http://127.0.0.1:8000/api/documentation`
+
+## 🔐 Authentication
+
+The API uses **Laravel Sanctum** for token-based authentication. All protected routes require a Bearer token in the Authorization header.
+
+### **🔑 Authentication Flow**
+
+1. **Register** a new user account
+2. **Login** to obtain an access token
+3. **Include token** in Authorization header for protected routes
+4. **Logout** to revoke the token
+
+### **📡 Authentication Endpoints**
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| `POST` | `/api/register` | Register a new user | ❌ No |
+| `POST` | `/api/login` | Login and get access token | ❌ No |
+| `GET` | `/api/user` | Get current user profile | ✅ Yes |
+| `POST` | `/api/logout` | Logout and revoke token | ✅ Yes |
+
+### **💻 Example Usage (PowerShell)**
 
 ```powershell
-# Register a new user
-$body = @{ name = "Test User"; email = "test@example.com"; password = "Password123!" } | ConvertTo-Json
-Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/api/register -ContentType 'application/json' -Body $body
+# 1. Register a new user
+$registerBody = @{
+    name = "Test User"
+    email = "test@example.com"
+    password = "Password123!"
+} | ConvertTo-Json
 
-# Login with admin credentials
-$login = @{ email = "admin@example.com"; password = "Password123!" } | ConvertTo-Json
-$resp = Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/api/login -ContentType 'application/json' -Body $login
-$token = $resp.access_token
+$registerResponse = Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:8000/api/register" -ContentType 'application/json' -Body $registerBody
 
-# Use token for protected endpoints
-$headers = @{ Authorization = "Bearer $token" }
-Invoke-RestMethod -Method Get -Uri http://127.0.0.1:8000/api/tasks -Headers $headers
+# 2. Login with credentials
+$loginBody = @{
+    email = "admin@example.com"
+    password = "Password123!"
+} | ConvertTo-Json
+
+$loginResponse = Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:8000/api/login" -ContentType 'application/json' -Body $loginBody
+
+# 3. Extract access token
+$accessToken = $loginResponse.access_token
+
+# 4. Use token for protected endpoints
+$headers = @{ Authorization = "Bearer $accessToken" }
+$tasks = Invoke-RestMethod -Method Get -Uri "http://127.0.0.1:8000/api/tasks" -Headers $headers
 ```
 
-## API Overview
+## 📚 API Overview
 
-Protected routes (require `Authorization: Bearer <token>`):
+### **📋 Task Management Endpoints**
 
-- `GET /api/tasks` – list tasks
-- `POST /api/tasks` – create task
-- `GET /api/tasks/{id}` – get task
-- `PUT /api/tasks/{id}` – update task (owner only)
-- `DELETE /api/tasks/{id}` – delete task (owner only)
-- `GET /api/my-tasks` – tasks created by the authenticated user
-- `GET /api/assigned-tasks` – tasks assigned to the authenticated user
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| `GET` | `/api/tasks` | List all tasks | ✅ Yes |
+| `POST` | `/api/tasks` | Create a new task | ✅ Yes |
+| `GET` | `/api/tasks/{id}` | Get specific task details | ✅ Yes |
+| `PUT` | `/api/tasks/{id}` | Update task (owner only) | ✅ Yes |
+| `DELETE` | `/api/tasks/{id}` | Delete task (owner only) | ✅ Yes |
+| `GET` | `/api/my-tasks` | Get tasks created by current user | ✅ Yes |
+| `GET` | `/api/assigned-tasks` | Get tasks assigned to current user | ✅ Yes |
 
-Comments nested under a task:
+### **💬 Comment Management Endpoints**
 
-- `GET /api/tasks/{task}/comments` – list comments
-- `POST /api/tasks/{task}/comments` – add comment (dispatches notification job)
-- `PUT /api/tasks/{task}/comments/{comment}` – update own comment
-- `DELETE /api/tasks/{task}/comments/{comment}` – delete own comment
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| `GET` | `/api/tasks/{task}/comments` | List comments for a task | ✅ Yes |
+| `POST` | `/api/tasks/{task}/comments` | Add comment to task | ✅ Yes |
+| `PUT` | `/api/tasks/{task}/comments/{comment}` | Update comment (owner only) | ✅ Yes |
+| `DELETE` | `/api/tasks/{task}/comments/{comment}` | Delete comment (owner only) | ✅ Yes |
 
-Note: Route protection and structure follow `routes/api.php`. Comment listing is cached for faster retrieval; creating/updating/deleting comments clears the relevant cache entries.
+### **🔒 Security Features**
 
-## Queues & Email
+- **Token-based Authentication** - All protected routes require Bearer token
+- **Owner-only Operations** - Users can only modify their own tasks/comments
+- **Request Validation** - All inputs are validated using Form Request classes
+- **Rate Limiting** - Built-in protection against abuse
+- **CORS Support** - Configurable cross-origin resource sharing
 
-- New comments dispatch a job that triggers an email notification.
-- By default, jobs are stored in the database; run `php artisan queue:work` to process them.
-- For local development, emails are written to the log via `MAIL_MAILER=log`.
+### **⚡ Performance Features**
+
+- **Redis Caching** - Comment listings are cached for faster retrieval
+- **Cache Invalidation** - Automatic cache clearing on data modifications
+- **Database Indexing** - Optimized database queries
+- **Eager Loading** - Reduced N+1 query problems
+
+## 📧 Queues & Email Notifications
+
+### **🔄 Queue System**
+
+The API uses Laravel's queue system for background job processing:
+
+- **Comment Notifications** - Email notifications are dispatched as background jobs
+- **Queue Drivers** - Supports database, Redis, or file-based queues
+- **Job Processing** - Run `php artisan queue:work` to process queued jobs
+- **Failed Jobs** - Failed jobs are logged and can be retried
+
+### **📨 Email Configuration**
+
+#### **Development (Log-based)**
+```env
+MAIL_MAILER=log
+MAIL_FROM_ADDRESS="noreply@taskmanagement.com"
+MAIL_FROM_NAME="Task Management System"
+```
+
+#### **Production (SMTP)**
+```env
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+MAIL_ENCRYPTION=tls
+```
+
+### **🚀 Queue Commands**
+
+```bash
+# Process all queued jobs
+php artisan queue:work
+
+# Process jobs with specific connection
+php artisan queue:work redis
+
+# Process failed jobs
+php artisan queue:retry all
+
+# Clear all failed jobs
+php artisan queue:flush
+```
 
 ## 🧪 **API Testing**
 
@@ -239,16 +387,93 @@ Note: Route protection and structure follow `routes/api.php`. Comment listing is
 Run the test suite:
 
 ```bash
+# Run all tests
 php artisan test
+
+# Run specific test file
+php artisan test tests/Feature/TaskTest.php
+
+# Run tests with coverage
+php artisan test --coverage
+
+# Run tests in parallel
+php artisan test --parallel
 ```
 
-If you use SQLite for testing, Laravel will use the testing database configuration automatically. Ensure the testing database is configured in `phpunit.xml` or `.env.testing` if you customize it.
+**📋 Test Configuration:**
+- Tests use a separate MySQL database (configured in `phpunit.xml`)
+- Database is automatically migrated and seeded for each test
+- All tests run in transactions and are rolled back after completion
 
-## Troubleshooting
+## 🔧 Troubleshooting
 
-- 500 errors after fresh setup: verify `.env` values, `APP_KEY` is set, and run `php artisan config:clear && php artisan cache:clear`.
-- Database errors: ensure your chosen database exists and credentials in `.env` are correct. For SQLite, the file `database/database.sqlite` must exist.
-- Jobs not processing: make sure `php artisan queue:work` is running and `QUEUE_CONNECTION` matches your configuration.
-- Email not sending: for local use `MAIL_MAILER=log` or configure SMTP settings.
+### **🚨 Common Issues & Solutions**
+
+#### **500 Internal Server Error**
+```bash
+# Clear configuration and cache
+php artisan config:clear
+php artisan cache:clear
+php artisan route:clear
+php artisan view:clear
+
+# Regenerate application key
+php artisan key:generate
+```
+
+#### **Database Connection Issues**
+- ✅ **Check MySQL Service** - Ensure MySQL server is running
+- ✅ **Verify Credentials** - Check `DB_USERNAME` and `DB_PASSWORD` in `.env`
+- ✅ **Database Exists** - Ensure `task_management_db` database exists
+- ✅ **Test Connection** - Run `php artisan migrate:status`
+
+#### **Queue Jobs Not Processing**
+```bash
+# Check queue configuration
+php artisan queue:work --verbose
+
+# Process failed jobs
+php artisan queue:retry all
+
+# Monitor queue status
+php artisan queue:monitor
+```
+
+#### **Email Notifications Not Working**
+- ✅ **Check Mail Configuration** - Verify SMTP settings in `.env`
+- ✅ **Test Email** - Use `MAIL_MAILER=log` for development
+- ✅ **Queue Worker** - Ensure `php artisan queue:work` is running
+
+#### **Redis Connection Issues**
+```bash
+# Test Redis connection
+redis-cli ping
+
+# Check Redis configuration
+php artisan tinker
+>>> Redis::ping()
+```
+
+#### **Authentication Issues**
+- ✅ **Sanctum Installed** - Run `composer require laravel/sanctum`
+- ✅ **Migrations Run** - Ensure `personal_access_tokens` table exists
+- ✅ **Middleware Applied** - Check `auth:sanctum` middleware on routes
+
+### **📊 Health Check Commands**
+
+```bash
+# Check application status
+php artisan about
+
+# Verify database connection
+php artisan migrate:status
+
+# Check queue configuration
+php artisan queue:work --once
+
+# Test email configuration
+php artisan tinker
+>>> Mail::raw('Test email', function($msg) { $msg->to('test@example.com')->subject('Test'); });
+```
 
 
