@@ -1,0 +1,990 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenAPI xmlns="http://swagger.io/schema/" version="3.0.0">
+  <info>
+    <title>Task Management System API</title>
+    <description>
+      Complete API documentation for Laravel Task Management System
+      
+      ## Features
+      - User Authentication & Authorization
+      - Task Management (CRUD operations)
+      - Task Assignment to Users
+      - Comments System
+      - Email Notifications
+      - Advanced Caching
+      - Queue Management
+      
+      ## Test Credentials
+      - **Admin:** admin@example.com / Password123!
+      - **User:** user@example.com / Password123!
+      - **Manager:** manager@example.com / Password123!
+      
+      ## Base URL
+      http://localhost:8000/api
+      
+      ## Authentication
+      This API uses Bearer Token authentication. Include the token in the Authorization header:
+      `Authorization: Bearer your_token_here`
+    </description>
+    <version>1.0.0</version>
+    <contact>
+      <email>support@taskmanagement.com</email>
+    </contact>
+  </info>
+  
+  <servers>
+    <server>
+      <url>http://localhost:8000/api</url>
+      <description>Development Server</description>
+    </server>
+    <server>
+      <url>https://api.taskmanagement.com</url>
+      <description>Production Server</description>
+    </server>
+  </servers>
+  
+  <paths>
+    
+    <!-- ========== AUTHENTICATION ENDPOINTS ========== -->
+    
+    <path path="/register">
+      <operation method="post">
+        <summary>Register New User</summary>
+        <description>Create a new user account in the system</description>
+        <tags>
+          <tag>Authentication</tag>
+        </tags>
+        <requestBody>
+          <content>
+            <mediaType type="application/json">
+              <schema>
+                <object>
+                  <property name="name" type="string" required="true" example="John Doe" description="User's full name"/>
+                  <property name="email" type="string" format="email" required="true" example="john@example.com" description="User's email address"/>
+                  <property name="password" type="string" format="password" required="true" example="Password123!" description="User password (min 8 chars with letters, numbers, symbols)"/>
+                  <property name="password_confirmation" type="string" format="password" required="true" example="Password123!" description="Password confirmation"/>
+                </object>
+              </schema>
+              <example>
+                {
+                  "name": "John Doe",
+                  "email": "john@example.com",
+                  "password": "Password123!",
+                  "password_confirmation": "Password123!"
+                }
+              </example>
+            </mediaType>
+          </content>
+        </requestBody>
+        <responses>
+          <response code="201">
+            <description>User registered successfully</description>
+            <content>
+              <mediaType type="application/json">
+                <schema>
+                  <object>
+                    <property name="message" type="string" example="User registered successfully"/>
+                    <property name="user">
+                      <object>
+                        <property name="id" type="integer" example="1"/>
+                        <property name="name" type="string" example="John Doe"/>
+                        <property name="email" type="string" example="john@example.com"/>
+                      </object>
+                    </property>
+                    <property name="access_token" type="string" example="1|UUXG3LdoT7JtV5F4ZpJMqnTDYYXnRdTJE6ZHoEZVe303727a"/>
+                    <property name="token_type" type="string" example="Bearer"/>
+                  </object>
+                </schema>
+              </mediaType>
+            </content>
+          </response>
+          <response code="422">
+            <description>Validation error</description>
+            <content>
+              <mediaType type="application/json">
+                <schema>
+                  <object>
+                    <property name="message" type="string" example="Validation failed"/>
+                    <property name="errors">
+                      <object>
+                        <property name="email" type="array">
+                          <item type="string" example="The email has already been taken."/>
+                        </property>
+                        <property name="password" type="array">
+                          <item type="string" example="The password must be at least 8 characters."/>
+                        </property>
+                      </object>
+                    </property>
+                  </object>
+                </schema>
+              </mediaType>
+            </content>
+          </response>
+        </responses>
+      </operation>
+    </path>
+    
+    <path path="/login">
+      <operation method="post">
+        <summary>Login User</summary>
+        <description>Authenticate user and receive access token</description>
+        <tags>
+          <tag>Authentication</tag>
+        </tags>
+        <requestBody>
+          <content>
+            <mediaType type="application/json">
+              <schema>
+                <object>
+                  <property name="email" type="string" format="email" required="true" example="admin@example.com"/>
+                  <property name="password" type="string" format="password" required="true" example="Password123!"/>
+                </object>
+              </schema>
+            </mediaType>
+          </content>
+        </requestBody>
+        <responses>
+          <response code="200">
+            <description>Login successful</description>
+            <content>
+              <mediaType type="application/json">
+                <schema>
+                  <object>
+                    <property name="message" type="string" example="Login successful"/>
+                    <property name="user">
+                      <object>
+                        <property name="id" type="integer" example="1"/>
+                        <property name="name" type="string" example="Admin User"/>
+                        <property name="email" type="string" example="admin@example.com"/>
+                      </object>
+                    </property>
+                    <property name="access_token" type="string" example="1|UUXG3LdoT7JtV5F4ZpJMqnTDYYXnRdTJE6ZHoEZVe303727a"/>
+                    <property name="token_type" type="string" example="Bearer"/>
+                  </object>
+                </schema>
+              </mediaType>
+            </content>
+          </response>
+          <response code="401">
+            <description>Invalid credentials</description>
+            <content>
+              <mediaType type="application/json">
+                <schema>
+                  <object>
+                    <property name="message" type="string" example="Invalid credentials"/>
+                  </object>
+                </schema>
+              </mediaType>
+            </content>
+          </response>
+          <response code="422">
+            <description>Validation error</description>
+          </response>
+        </responses>
+      </operation>
+    </path>
+    
+    <path path="/user">
+      <operation method="get">
+        <summary>Get Current User Profile</summary>
+        <description>Retrieve authenticated user's profile information</description>
+        <tags>
+          <tag>Authentication</tag>
+        </tags>
+        <security>
+          <securityScheme name="bearerAuth"/>
+        </security>
+        <responses>
+          <response code="200">
+            <description>User profile retrieved successfully</description>
+            <content>
+              <mediaType type="application/json">
+                <schema>
+                  <object>
+                    <property name="user">
+                      <object>
+                        <property name="id" type="integer" example="1"/>
+                        <property name="name" type="string" example="Admin User"/>
+                        <property name="email" type="string" example="admin@example.com"/>
+                      </object>
+                    </property>
+                  </object>
+                </schema>
+              </mediaType>
+            </content>
+          </response>
+          <response code="401">
+            <description>Unauthenticated</description>
+          </response>
+        </responses>
+      </operation>
+    </path>
+    
+    <path path="/logout">
+      <operation method="post">
+        <summary>Logout User</summary>
+        <description>Revoke the current access token</description>
+        <tags>
+          <tag>Authentication</tag>
+        </tags>
+        <security>
+          <securityScheme name="bearerAuth"/>
+        </security>
+        <responses>
+          <response code="200">
+            <description>Successfully logged out</description>
+            <content>
+              <mediaType type="application/json">
+                <schema>
+                  <object>
+                    <property name="message" type="string" example="Successfully logged out"/>
+                  </object>
+                </schema>
+              </mediaType>
+            </content>
+          </response>
+          <response code="401">
+            <description>Unauthenticated</description>
+          </response>
+        </responses>
+      </operation>
+    </path>
+    
+    <!-- ========== TASK MANAGEMENT ENDPOINTS ========== -->
+    
+    <path path="/tasks">
+      <operation method="get">
+        <summary>Get All Tasks</summary>
+        <description>Retrieve paginated list of all tasks in the system</description>
+        <tags>
+          <tag>Tasks</tag>
+        </tags>
+        <security>
+          <securityScheme name="bearerAuth"/>
+        </security>
+        <parameters>
+          <parameter name="page" in="query" required="false">
+            <schema type="integer" example="1" description="Page number for pagination"/>
+          </parameter>
+          <parameter name="per_page" in="query" required="false">
+            <schema type="integer" example="10" description="Number of items per page"/>
+          </parameter>
+        </parameters>
+        <responses>
+          <response code="200">
+            <description>Tasks retrieved successfully</description>
+            <content>
+              <mediaType type="application/json">
+                <schema>
+                  <object>
+                    <property name="data" type="array">
+                      <items>
+                        <object>
+                          <property name="id" type="integer" example="1"/>
+                          <property name="title" type="string" example="Complete Project Documentation"/>
+                          <property name="description" type="string" example="Write comprehensive documentation for the project"/>
+                          <property name="status" type="string" enum="pending,in-progress,completed" example="pending"/>
+                          <property name="due_date" type="string" format="date" example="2024-12-31"/>
+                          <property name="user_id" type="integer" example="1"/>
+                          <property name="assigned_to" type="integer" example="2"/>
+                          <property name="created_at" type="string" format="date-time" example="2024-01-15T10:00:00.000000Z"/>
+                          <property name="updated_at" type="string" format="date-time" example="2024-01-15T10:00:00.000000Z"/>
+                          <property name="user">
+                            <object>
+                              <property name="id" type="integer" example="1"/>
+                              <property name="name" type="string" example="Admin User"/>
+                              <property name="email" type="string" example="admin@example.com"/>
+                            </object>
+                          </property>
+                          <property name="assignee">
+                            <object>
+                              <property name="id" type="integer" example="2"/>
+                              <property name="name" type="string" example="Regular User"/>
+                              <property name="email" type="string" example="user@example.com"/>
+                            </object>
+                          </property>
+                        </object>
+                      </items>
+                    </property>
+                    <property name="links">
+                      <object>
+                        <property name="first" type="string" example="http://localhost:8000/api/tasks?page=1"/>
+                        <property name="last" type="string" example="http://localhost:8000/api/tasks?page=5"/>
+                        <property name="prev" type="string" example="null"/>
+                        <property name="next" type="string" example="http://localhost:8000/api/tasks?page=2"/>
+                      </object>
+                    </property>
+                    <property name="meta">
+                      <object>
+                        <property name="current_page" type="integer" example="1"/>
+                        <property name="from" type="integer" example="1"/>
+                        <property name="last_page" type="integer" example="5"/>
+                        <property name="per_page" type="integer" example="10"/>
+                        <property name="to" type="integer" example="10"/>
+                        <property name="total" type="integer" example="50"/>
+                      </object>
+                    </property>
+                  </object>
+                </schema>
+              </mediaType>
+            </content>
+          </response>
+          <response code="401">
+            <description>Unauthenticated</description>
+          </response>
+        </responses>
+      </operation>
+      
+      <operation method="post">
+        <summary>Create New Task</summary>
+        <description>Create a new task and assign it to a user</description>
+        <tags>
+          <tag>Tasks</tag>
+        </tags>
+        <security>
+          <securityScheme name="bearerAuth"/>
+        </security>
+        <requestBody>
+          <content>
+            <mediaType type="application/json">
+              <schema>
+                <object>
+                  <property name="title" type="string" required="true" example="API Test Task" description="Task title"/>
+                  <property name="description" type="string" required="true" example="This is a test task created via API" description="Task description"/>
+                  <property name="status" type="string" enum="pending,in-progress,completed" required="true" example="pending" description="Task status"/>
+                  <property name="due_date" type="string" format="date" required="true" example="2024-12-31" description="Due date (must be after today)"/>
+                  <property name="assigned_to" type="integer" required="true" example="2" description="ID of user to assign the task to"/>
+                </object>
+              </schema>
+              <example>
+                {
+                  "title": "API Test Task",
+                  "description": "This is a test task created via API",
+                  "status": "pending",
+                  "due_date": "2024-12-31",
+                  "assigned_to": 2
+                }
+              </example>
+            </mediaType>
+          </content>
+        </requestBody>
+        <responses>
+          <response code="201">
+            <description>Task created successfully</description>
+            <content>
+              <mediaType type="application/json">
+                <schema>
+                  <object>
+                    <property name="message" type="string" example="Task created successfully"/>
+                    <property name="data">
+                      <object>
+                        <property name="id" type="integer" example="1"/>
+                        <property name="title" type="string" example="API Test Task"/>
+                        <property name="description" type="string" example="This is a test task created via API"/>
+                        <property name="status" type="string" example="pending"/>
+                        <property name="due_date" type="string" format="date" example="2024-12-31"/>
+                        <property name="user_id" type="integer" example="1"/>
+                        <property name="assigned_to" type="integer" example="2"/>
+                        <property name="created_at" type="string" format="date-time" example="2024-01-15T10:00:00.000000Z"/>
+                        <property name="updated_at" type="string" format="date-time" example="2024-01-15T10:00:00.000000Z"/>
+                      </object>
+                    </property>
+                  </object>
+                </schema>
+              </mediaType>
+            </content>
+          </response>
+          <response code="422">
+            <description>Validation error</description>
+          </response>
+          <response code="401">
+            <description>Unauthenticated</description>
+          </response>
+        </responses>
+      </operation>
+    </path>
+    
+    <path path="/tasks/{id}">
+      <operation method="get">
+        <summary>Get Single Task</summary>
+        <description>Retrieve detailed information about a specific task including comments</description>
+        <tags>
+          <tag>Tasks</tag>
+        </tags>
+        <security>
+          <securityScheme name="bearerAuth"/>
+        </security>
+        <parameters>
+          <parameter name="id" in="path" required="true">
+            <schema type="integer" example="1" description="Task ID"/>
+          </parameter>
+        </parameters>
+        <responses>
+          <response code="200">
+            <description>Task retrieved successfully</description>
+            <content>
+              <mediaType type="application/json">
+                <schema>
+                  <object>
+                    <property name="data">
+                      <object>
+                        <property name="id" type="integer" example="1"/>
+                        <property name="title" type="string" example="API Test Task"/>
+                        <property name="description" type="string" example="This is a test task created via API"/>
+                        <property name="status" type="string" example="pending"/>
+                        <property name="due_date" type="string" format="date" example="2024-12-31"/>
+                        <property name="user_id" type="integer" example="1"/>
+                        <property name="assigned_to" type="integer" example="2"/>
+                        <property name="created_at" type="string" format="date-time" example="2024-01-15T10:00:00.000000Z"/>
+                        <property name="updated_at" type="string" format="date-time" example="2024-01-15T10:00:00.000000Z"/>
+                        <property name="user">
+                          <object>
+                            <property name="id" type="integer" example="1"/>
+                            <property name="name" type="string" example="Admin User"/>
+                            <property name="email" type="string" example="admin@example.com"/>
+                          </object>
+                        </property>
+                        <property name="assignee">
+                          <object>
+                            <property name="id" type="integer" example="2"/>
+                            <property name="name" type="string" example="Regular User"/>
+                            <property name="email" type="string" example="user@example.com"/>
+                          </object>
+                        </property>
+                        <property name="comments" type="array">
+                          <items>
+                            <object>
+                              <property name="id" type="integer" example="1"/>
+                              <property name="content" type="string" example="This is a comment on the task"/>
+                              <property name="user_id" type="integer" example="2"/>
+                              <property name="task_id" type="integer" example="1"/>
+                              <property name="created_at" type="string" format="date-time" example="2024-01-15T10:30:00.000000Z"/>
+                              <property name="updated_at" type="string" format="date-time" example="2024-01-15T10:30:00.000000Z"/>
+                              <property name="user">
+                                <object>
+                                  <property name="id" type="integer" example="2"/>
+                                  <property name="name" type="string" example="Regular User"/>
+                                  <property name="email" type="string" example="user@example.com"/>
+                                </object>
+                              </property>
+                            </object>
+                          </items>
+                        </property>
+                      </object>
+                    </property>
+                  </object>
+                </schema>
+              </mediaType>
+            </content>
+          </response>
+          <response code="404">
+            <description>Task not found</description>
+          </response>
+          <response code="401">
+            <description>Unauthenticated</description>
+          </response>
+        </responses>
+      </operation>
+      
+      <operation method="put">
+        <summary>Update Task</summary>
+        <description>Update an existing task (only task creator can update)</description>
+        <tags>
+          <tag>Tasks</tag>
+        </tags>
+        <security>
+          <securityScheme name="bearerAuth"/>
+        </security>
+        <parameters>
+          <parameter name="id" in="path" required="true">
+            <schema type="integer" example="1" description="Task ID"/>
+          </parameter>
+        </parameters>
+        <requestBody>
+          <content>
+            <mediaType type="application/json">
+              <schema>
+                <object>
+                  <property name="title" type="string" required="false" example="Updated API Test Task"/>
+                  <property name="description" type="string" required="false" example="This task has been updated via API"/>
+                  <property name="status" type="string" enum="pending,in-progress,completed" required="false" example="in-progress"/>
+                  <property name="due_date" type="string" format="date" required="false" example="2024-11-30"/>
+                  <property name="assigned_to" type="integer" required="false" example="3" description="ID of user to reassign the task to"/>
+                </object>
+              </schema>
+              <example>
+                {
+                  "title": "Updated API Test Task",
+                  "description": "This task has been updated via API",
+                  "status": "in-progress",
+                  "due_date": "2024-11-30"
+                }
+              </example>
+            </mediaType>
+          </content>
+        </requestBody>
+        <responses>
+          <response code="200">
+            <description>Task updated successfully</description>
+          </response>
+          <response code="403">
+            <description>Unauthorized - Only task creator can update</description>
+          </response>
+          <response code="404">
+            <description>Task not found</description>
+          </response>
+          <response code="422">
+            <description>Validation error</description>
+          </response>
+        </responses>
+      </operation>
+      
+      <operation method="delete">
+        <summary>Delete Task</summary>
+        <description>Delete a task (only task creator can delete)</description>
+        <tags>
+          <tag>Tasks</tag>
+        </tags>
+        <security>
+          <securityScheme name="bearerAuth"/>
+        </security>
+        <parameters>
+          <parameter name="id" in="path" required="true">
+            <schema type="integer" example="1" description="Task ID"/>
+          </parameter>
+        </parameters>
+        <responses>
+          <response code="200">
+            <description>Task deleted successfully</description>
+            <content>
+              <mediaType type="application/json">
+                <schema>
+                  <object>
+                    <property name="message" type="string" example="Task deleted successfully"/>
+                  </object>
+                </schema>
+              </mediaType>
+            </content>
+          </response>
+          <response code="403">
+            <description>Unauthorized - Only task creator can delete</description>
+          </response>
+          <response code="404">
+            <description>Task not found</description>
+          </response>
+          <response code="401">
+            <description>Unauthenticated</description>
+          </response>
+        </responses>
+      </operation>
+    </path>
+    
+    <path path="/my-tasks">
+      <operation method="get">
+        <summary>Get My Created Tasks</summary>
+        <description>Retrieve tasks created by the authenticated user</description>
+        <tags>
+          <tag>Tasks</tag>
+        </tags>
+        <security>
+          <securityScheme name="bearerAuth"/>
+        </security>
+        <responses>
+          <response code="200">
+            <description>Tasks retrieved successfully</description>
+            <content>
+              <mediaType type="application/json">
+                <schema>
+                  <object>
+                    <property name="data" type="array">
+                      <items>
+                        <object>
+                          <property name="id" type="integer" example="1"/>
+                          <property name="title" type="string" example="My Created Task"/>
+                          <property name="description" type="string" example="This is a task I created"/>
+                          <property name="status" type="string" example="pending"/>
+                          <property name="due_date" type="string" format="date" example="2024-12-31"/>
+                          <property name="user_id" type="integer" example="1"/>
+                          <property name="assigned_to" type="integer" example="2"/>
+                        </object>
+                      </items>
+                    </property>
+                  </object>
+                </schema>
+              </mediaType>
+            </content>
+          </response>
+          <response code="401">
+            <description>Unauthenticated</description>
+          </response>
+        </responses>
+      </operation>
+    </path>
+    
+    <path path="/assigned-tasks">
+      <operation method="get">
+        <summary>Get My Assigned Tasks</summary>
+        <description>Retrieve tasks assigned to the authenticated user</description>
+        <tags>
+          <tag>Tasks</tag>
+        </tags>
+        <security>
+          <securityScheme name="bearerAuth"/>
+        </security>
+        <responses>
+          <response code="200">
+            <description>Tasks retrieved successfully</description>
+            <content>
+              <mediaType type="application/json">
+                <schema>
+                  <object>
+                    <property name="data" type="array">
+                      <items>
+                        <object>
+                          <property name="id" type="integer" example="2"/>
+                          <property name="title" type="string" example="Task Assigned to Me"/>
+                          <property name="description" type="string" example="This task was assigned to me"/>
+                          <property name="status" type="string" example="in-progress"/>
+                          <property name="due_date" type="string" format="date" example="2024-11-15"/>
+                          <property name="user_id" type="integer" example="3"/>
+                          <property name="assigned_to" type="integer" example="1"/>
+                        </object>
+                      </items>
+                    </property>
+                  </object>
+                </schema>
+              </mediaType>
+            </content>
+          </response>
+          <response code="401">
+            <description>Unauthenticated</description>
+          </response>
+        </responses>
+      </operation>
+    </path>
+    
+    <!-- ========== COMMENTS ENDPOINTS ========== -->
+    
+    <path path="/tasks/{task}/comments">
+      <operation method="get">
+        <summary>Get Task Comments</summary>
+        <description>Retrieve all comments for a specific task</description>
+        <tags>
+          <tag>Comments</tag>
+        </tags>
+        <security>
+          <securityScheme name="bearerAuth"/>
+        </security>
+        <parameters>
+          <parameter name="task" in="path" required="true">
+            <schema type="integer" example="1" description="Task ID"/>
+          </parameter>
+        </parameters>
+        <responses>
+          <response code="200">
+            <description>Comments retrieved successfully</description>
+            <content>
+              <mediaType type="application/json">
+                <schema>
+                  <array>
+                    <items>
+                      <object>
+                        <property name="id" type="integer" example="1"/>
+                        <property name="content" type="string" example="This is a comment on the task"/>
+                        <property name="task_id" type="integer" example="1"/>
+                        <property name="user_id" type="integer" example="2"/>
+                        <property name="created_at" type="string" format="date-time" example="2024-01-15T10:30:00.000000Z"/>
+                        <property name="updated_at" type="string" format="date-time" example="2024-01-15T10:30:00.000000Z"/>
+                        <property name="user">
+                          <object>
+                            <property name="id" type="integer" example="2"/>
+                            <property name="name" type="string" example="Regular User"/>
+                            <property name="email" type="string" example="user@example.com"/>
+                          </object>
+                        </property>
+                      </object>
+                    </items>
+                  </array>
+                </schema>
+              </mediaType>
+            </content>
+          </response>
+          <response code="401">
+            <description>Unauthenticated</description>
+          </response>
+        </responses>
+      </operation>
+      
+      <operation method="post">
+        <summary>Add Comment to Task</summary>
+        <description>Add a new comment to a task (triggers email notification to task creator)</description>
+        <tags>
+          <tag>Comments</tag>
+        </tags>
+        <security>
+          <securityScheme name="bearerAuth"/>
+        </security>
+        <parameters>
+          <parameter name="task" in="path" required="true">
+            <schema type="integer" example="1" description="Task ID"/>
+          </parameter>
+        </parameters>
+        <requestBody>
+          <content>
+            <mediaType type="application/json">
+              <schema>
+                <object>
+                  <property name="content" type="string" required="true" example="This is a test comment via API" description="Comment content (max 1000 characters)"/>
+                </object>
+              </schema>
+            </mediaType>
+          </content>
+        </requestBody>
+        <responses>
+          <response code="201">
+            <description>Comment added successfully</description>
+            <content>
+              <mediaType type="application/json">
+                <schema>
+                  <object>
+                    <property name="message" type="string" example="Comment added successfully"/>
+                    <property name="data">
+                      <object>
+                        <property name="id" type="integer" example="1"/>
+                        <property name="content" type="string" example="This is a test comment via API"/>
+                        <property name="task_id" type="integer" example="1"/>
+                        <property name="user_id" type="integer" example="2"/>
+                        <property name="created_at" type="string" format="date-time" example="2024-01-15T10:30:00.000000Z"/>
+                        <property name="updated_at" type="string" format="date-time" example="2024-01-15T10:30:00.000000Z"/>
+                        <property name="user">
+                          <object>
+                            <property name="id" type="integer" example="2"/>
+                            <property name="name" type="string" example="Regular User"/>
+                            <property name="email" type="string" example="user@example.com"/>
+                          </object>
+                        </property>
+                      </object>
+                    </property>
+                  </object>
+                </schema>
+              </mediaType>
+            </content>
+          </response>
+          <response code="404">
+            <description>Task not found</description>
+          </response>
+          <response code="422">
+            <description>Validation error</description>
+          </response>
+        </responses>
+      </operation>
+    </path>
+    
+    <path path="/tasks/{task}/comments/{comment}">
+      <operation method="put">
+        <summary>Update Comment</summary>
+        <description>Update an existing comment (only comment author can update)</description>
+        <tags>
+          <tag>Comments</tag>
+        </tags>
+        <security>
+          <securityScheme name="bearerAuth"/>
+        </security>
+        <parameters>
+          <parameter name="task" in="path" required="true">
+            <schema type="integer" example="1" description="Task ID"/>
+          </parameter>
+          <parameter name="comment" in="path" required="true">
+            <schema type="integer" example="1" description="Comment ID"/>
+          </parameter>
+        </parameters>
+        <requestBody>
+          <content>
+            <mediaType type="application/json">
+              <schema>
+                <object>
+                  <property name="content" type="string" required="true" example="This comment has been updated via API"/>
+                </object>
+              </schema>
+            </mediaType>
+          </content>
+        </requestBody>
+        <responses>
+          <response code="200">
+            <description>Comment updated successfully</description>
+          </response>
+          <response code="403">
+            <description>Unauthorized - Only comment author can update</description>
+          </response>
+          <response code="404">
+            <description>Comment not found</description>
+          </response>
+        </responses>
+      </operation>
+      
+      <operation method="delete">
+        <summary>Delete Comment</summary>
+        <description>Delete a comment (only comment author can delete)</description>
+        <tags>
+          <tag>Comments</tag>
+        </tags>
+        <security>
+          <securityScheme name="bearerAuth"/>
+        </security>
+        <parameters>
+          <parameter name="task" in="path" required="true">
+            <schema type="integer" example="1" description="Task ID"/>
+          </parameter>
+          <parameter name="comment" in="path" required="true">
+            <schema type="integer" example="1" description="Comment ID"/>
+          </parameter>
+        </parameters>
+        <responses>
+          <response code="200">
+            <description>Comment deleted successfully</description>
+            <content>
+              <mediaType type="application/json">
+                <schema>
+                  <object>
+                    <property name="message" type="string" example="Comment deleted successfully"/>
+                  </object>
+                </schema>
+              </mediaType>
+            </content>
+          </response>
+          <response code="403">
+            <description>Unauthorized - Only comment author can delete</description>
+          </response>
+          <response code="404">
+            <description>Comment not found</description>
+          </response>
+        </responses>
+      </operation>
+    </path>
+    
+  </paths>
+  
+  <components>
+    <securitySchemes>
+      <securityScheme name="bearerAuth" type="http" scheme="bearer" bearerFormat="JWT">
+        <description>JWT Bearer Token Authentication. Include your token in the Authorization header: `Bearer your_token_here`</description>
+      </securityScheme>
+    </securitySchemes>
+    
+    <schemas>
+      <schema name="Task">
+        <object>
+          <property name="id" type="integer" example="1"/>
+          <property name="title" type="string" example="Complete Project Documentation"/>
+          <property name="description" type="string" example="Write comprehensive documentation for the project"/>
+          <property name="status" type="string" enum="pending,in-progress,completed" example="pending"/>
+          <property name="due_date" type="string" format="date" example="2024-12-31"/>
+          <property name="user_id" type="integer" example="1"/>
+          <property name="assigned_to" type="integer" example="2"/>
+          <property name="created_at" type="string" format="date-time" example="2024-01-15T10:00:00.000000Z"/>
+          <property name="updated_at" type="string" format="date-time" example="2024-01-15T10:00:00.000000Z"/>
+        </object>
+      </schema>
+      
+      <schema name="User">
+        <object>
+          <property name="id" type="integer" example="1"/>
+          <property name="name" type="string" example="John Doe"/>
+          <property name="email" type="string" format="email" example="john@example.com"/>
+        </object>
+      </schema>
+      
+      <schema name="Comment">
+        <object>
+          <property name="id" type="integer" example="1"/>
+          <property name="content" type="string" example="This is a comment on the task"/>
+          <property name="task_id" type="integer" example="1"/>
+          <property name="user_id" type="integer" example="2"/>
+          <property name="created_at" type="string" format="date-time" example="2024-01-15T10:30:00.000000Z"/>
+          <property name="updated_at" type="string" format="date-time" example="2024-01-15T10:30:00.000000Z"/>
+        </object>
+      </schema>
+      
+      <schema name="Error">
+        <object>
+          <property name="message" type="string" example="Validation failed"/>
+          <property name="errors">
+            <object>
+              <property name="field_name" type="array">
+                <items type="string" example="The field name is required."/>
+              </property>
+            </object>
+          </property>
+        </object>
+      </schema>
+      
+      <schema name="ValidationError">
+        <object>
+          <property name="message" type="string" example="The given data was invalid."/>
+          <property name="errors">
+            <object>
+              <property name="email" type="array">
+                <items type="string" example="The email field is required."/>
+              </property>
+              <property name="password" type="array">
+                <items type="string" example="The password must be at least 8 characters."/>
+              </property>
+            </object>
+          </property>
+        </object>
+      </schema>
+    </schemas>
+    
+    <responses>
+      <response name="Unauthenticated">
+        <description>Unauthenticated - Missing or invalid authentication token</description>
+        <content>
+          <mediaType type="application/json">
+            <schema>
+              <object>
+                <property name="message" type="string" example="Unauthenticated."/>
+              </object>
+            </schema>
+          </mediaType>
+        </content>
+      </response>
+      
+      <response name="NotFound">
+        <description>Resource not found</description>
+        <content>
+          <mediaType type="application/json">
+            <schema>
+              <object>
+                <property name="message" type="string" example="Resource not found."/>
+              </object>
+            </schema>
+          </mediaType>
+        </content>
+      </response>
+      
+      <response name="Forbidden">
+        <description>Forbidden - User doesn't have permission</description>
+        <content>
+          <mediaType type="application/json">
+            <schema>
+              <object>
+                <property name="message" type="string" example="This action is unauthorized."/>
+              </object>
+            </schema>
+          </mediaType>
+        </content>
+      </response>
+    </responses>
+  </components>
+  
+  <tags>
+    <tag name="Authentication" description="User registration, login, logout, and profile management"/>
+    <tag name="Tasks" description="Task management operations (CRUD) and task assignment"/>
+    <tag name="Comments" description="Task comments management with email notifications"/>
+  </tags>
+  
+  <externalDocs>
+    <description>Find out more about this API</description>
+    <url>https://github.com/yourusername/task-management-api</url>
+  </externalDocs>
+</OpenAPI>
