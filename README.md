@@ -1,61 +1,254 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Task Management System API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel-based API for managing tasks and comments with token authentication, caching, and queued notifications.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Authentication (token-based register/login, Bearer tokens)
+- Task CRUD and listing of own/assigned tasks
+- Commenting on tasks
+- Email notifications dispatched via queue on new comments
+- Caching of frequently read data
+- Repository pattern and request validation
+- Feature tests
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Laravel 12 (PHP 8.4+)
+- MySQL
+- Queue: database (default)
+- Cache:  Redis
 
-## Learning Laravel
+## Prerequisites
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP 8.4+
+- Composer
+- Git
+- Node.js 18+ (only if you plan to use Vite/dev assets; not required for API)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## Quick Start (Windows PowerShell)
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```powershell
+# Clone
+git clone Task-Mangement-App
+cd Task-Mangement-App
 
-## Laravel Sponsors
+# Install PHP dependencies
+composer install
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# Copy environment and generate app key
+cp .env.example .env
+php artisan key:generate
 
-### Premium Partners
+# Use SQLite by default (recommended for local):
+# Ensure database file exists
+New-Item -ItemType File -Path .\database\database.sqlite -Force | Out-Null
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# Update .env (see next section) then run migrations and seeders
+php artisan migrate --seed
 
-## Contributing
+# Serve the API
+php artisan serve
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# In another terminal, start the queue worker (for email notifications)
+php artisan queue:work
+```
 
-## Code of Conduct
+The API will be available at `http://127.0.0.1:8000`.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Environment Configuration
 
-## Security Vulnerabilities
+Minimal `.env` for local development using SQLite and queued notifications stored in the database:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```env
+APP_NAME="Task Management API"
+APP_ENV=local
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://127.0.0.1:8000
 
-## License
+LOG_CHANNEL=stack
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# Database (SQLite)
+DB_CONNECTION=sqlite
+DB_DATABASE=database/database.sqlite
+
+# Cache & Queue
+CACHE_DRIVER=file
+QUEUE_CONNECTION=database
+SESSION_DRIVER=file
+
+# Mail (use log for local so emails are written to storage/logs/laravel.log)
+MAIL_MAILER=log
+MAIL_FROM_ADDRESS="no-reply@example.test"
+MAIL_FROM_NAME="Task Management API"
+
+# If you prefer Redis for cache/queue, set:
+# CACHE_DRIVER=redis
+# QUEUE_CONNECTION=redis
+# REDIS_HOST=127.0.0.1
+# REDIS_PORT=6379
+```
+
+If you prefer MySQL/PostgreSQL, set `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD` accordingly and remove the SQLite settings.
+
+## Running the Application
+
+1. Ensure `.env` is configured and the database exists.
+2. Run database migrations (and seeders if desired):
+   ```bash
+   php artisan migrate --seed
+   ```
+3. Start the development server:
+   ```bash
+   php artisan serve
+   ```
+4. In a separate terminal, start the queue worker to process notifications:
+   ```bash
+   php artisan queue:work
+   ```
+
+## Authentication
+
+Use the public endpoints to obtain a token, then include it as `Authorization: Bearer <token>` for all protected routes.
+
+- `POST /api/register` – create a user
+- `POST /api/login` – obtain an access token
+
+Example (PowerShell using `Invoke-RestMethod`):
+
+```powershell
+# Register a new user
+$body = @{ name = "Test User"; email = "test@example.com"; password = "Password123!" } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/api/register -ContentType 'application/json' -Body $body
+
+# Login with admin credentials
+$login = @{ email = "admin@example.com"; password = "Password123!" } | ConvertTo-Json
+$resp = Invoke-RestMethod -Method Post -Uri http://127.0.0.1:8000/api/login -ContentType 'application/json' -Body $login
+$token = $resp.access_token
+
+# Use token for protected endpoints
+$headers = @{ Authorization = "Bearer $token" }
+Invoke-RestMethod -Method Get -Uri http://127.0.0.1:8000/api/tasks -Headers $headers
+```
+
+## API Overview
+
+Protected routes (require `Authorization: Bearer <token>`):
+
+- `GET /api/tasks` – list tasks
+- `POST /api/tasks` – create task
+- `GET /api/tasks/{id}` – get task
+- `PUT /api/tasks/{id}` – update task (owner only)
+- `DELETE /api/tasks/{id}` – delete task (owner only)
+- `GET /api/my-tasks` – tasks created by the authenticated user
+- `GET /api/assigned-tasks` – tasks assigned to the authenticated user
+
+Comments nested under a task:
+
+- `GET /api/tasks/{task}/comments` – list comments
+- `POST /api/tasks/{task}/comments` – add comment (dispatches notification job)
+- `PUT /api/tasks/{task}/comments/{comment}` – update own comment
+- `DELETE /api/tasks/{task}/comments/{comment}` – delete own comment
+
+Note: Route protection and structure follow `routes/api.php`. Comment listing is cached for faster retrieval; creating/updating/deleting comments clears the relevant cache entries.
+
+## Queues & Email
+
+- New comments dispatch a job that triggers an email notification.
+- By default, jobs are stored in the database; run `php artisan queue:work` to process them.
+- For local development, emails are written to the log via `MAIL_MAILER=log`.
+
+## 🧪 **API Testing**
+
+### **🚀 Quick Testing with Postman**
+
+#### **📥 Import the Postman Collection:**
+
+1. **Download the collection file:**
+   ```bash
+   # From the project root
+   curl -o Task-Management-API.postman_collection.json https://raw.githubusercontent.com/yourusername/task-management-api/main/docs/Task-Management-API.postman_collection.json
+   ```
+
+2. **Import into Postman:**
+   - Open Postman
+   - Click **Import** button
+   - Select the `Task-Management-API.postman_collection.json` file
+   - Click **Import**
+
+3. **Set Environment Variables:**
+   - Create a new environment in Postman
+   - Add variable: `baseUrl` = `http://127.0.0.1:8000/api`
+   - Save the environment
+
+4. **Test Credentials (Ready to Use):**
+   - **Admin**: `admin@example.com` / `Password123!`
+   - **User**: `user@example.com` / `Password123!`
+   - **Manager**: `manager@example.com` / `Password123!`
+
+#### **🎯 Testing Flow:**
+1. **Register** → **Login** → **Get Token** → **Test Protected Endpoints**
+2. All requests are pre-configured with proper headers and examples
+3. Token is automatically saved and used for authenticated requests
+
+---
+
+### **🌐 Interactive Swagger UI Testing**
+
+#### **📖 Access Swagger Documentation:**
+
+**🔗 Visit:** `http://127.0.0.1:8000/api/docs`
+
+#### **✨ Features:**
+- **Interactive API Explorer** - Test endpoints directly in the browser
+- **Real-time Request/Response** - See actual API responses
+- **Authentication Support** - Built-in Bearer token authentication
+- **Example Data** - Pre-filled with realistic test data
+- **Try It Out** - One-click testing for all endpoints
+
+#### **🔐 How to Test with Swagger:**
+1. **Open** `http://127.0.0.1:8000/api/docs`
+2. **Register** a new user using the `/api/register` endpoint
+3. **Login** using `/api/login` endpoint
+4. **Copy the access token** from the response
+5. **Click "Authorize"** button (🔒 icon)
+6. **Enter:** `Bearer YOUR_ACCESS_TOKEN`
+7. **Test all protected endpoints** with the "Try it out" button
+
+#### **📋 Test Data Examples:**
+```json
+// Registration
+{
+  "name": "Test User",
+  "email": "test@example.com", 
+  "password": "Password123!"
+}
+
+// Login
+{
+  "email": "admin@example.com",
+  "password": "Password123!"
+}
+```
+
+---
+
+### **🔧 Unit Testing**
+
+Run the test suite:
+
+```bash
+php artisan test
+```
+
+If you use SQLite for testing, Laravel will use the testing database configuration automatically. Ensure the testing database is configured in `phpunit.xml` or `.env.testing` if you customize it.
+
+## Troubleshooting
+
+- 500 errors after fresh setup: verify `.env` values, `APP_KEY` is set, and run `php artisan config:clear && php artisan cache:clear`.
+- Database errors: ensure your chosen database exists and credentials in `.env` are correct. For SQLite, the file `database/database.sqlite` must exist.
+- Jobs not processing: make sure `php artisan queue:work` is running and `QUEUE_CONNECTION` matches your configuration.
+- Email not sending: for local use `MAIL_MAILER=log` or configure SMTP settings.
+
+
