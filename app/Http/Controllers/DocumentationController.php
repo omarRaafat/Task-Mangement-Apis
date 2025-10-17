@@ -42,7 +42,8 @@ class DocumentationController extends Controller
                                         'properties' => [
                                             'name' => ['type' => 'string', 'example' => 'Test User'],
                                             'email' => ['type' => 'string', 'format' => 'email', 'example' => 'test@example.com'],
-                                            'password' => ['type' => 'string', 'format' => 'password', 'example' => 'Password123!']
+                                            'password' => ['type' => 'string', 'format' => 'password', 'example' => 'Password123!'],
+                                            'password_confirmation' => ['type' => 'string', 'format' => 'password', 'example' => 'Password123!']
                                         ]
                                     ]
                                 ]
@@ -197,7 +198,7 @@ class DocumentationController extends Controller
                                                     'description' => ['type' => 'string', 'example' => 'This is a test task created via API'],
                                                     'status' => ['type' => 'string', 'example' => 'pending'],
                                                     'user_id' => ['type' => 'integer', 'example' => 1],
-                                                    'assigned_to' => ['type' => 'integer', 'example' => 15],
+                                                    'assigned_to' => ['type' => 'integer', 'example' => 1],
                                                     'created_at' => ['type' => 'string', 'format' => 'date-time'],
                                                     'updated_at' => ['type' => 'string', 'format' => 'date-time']
                                                 ]
@@ -223,7 +224,8 @@ class DocumentationController extends Controller
                                             'title' => ['type' => 'string', 'example' => 'API Test Task'],
                                             'description' => ['type' => 'string', 'example' => 'This is a test task created via API'],
                                             'status' => ['type' => 'string', 'enum' => ['pending', 'in-progress', 'completed'], 'example' => 'pending'],
-                                            'assigned_to' => ['type' => 'integer', 'example' => 15]
+                                            'assigned_to' => ['type' => 'integer', 'example' => 1],
+                                            'due_date' => ['type' => 'date', 'example' => '2025-12-31']
                                         ]
                                     ]
                                 ]
@@ -242,7 +244,7 @@ class DocumentationController extends Controller
                                                 'description' => ['type' => 'string', 'example' => 'This is a test task created via API'],
                                                 'status' => ['type' => 'string', 'example' => 'pending'],
                                                 'user_id' => ['type' => 'integer', 'example' => 1],
-                                                'assigned_to' => ['type' => 'integer', 'example' => 15],
+                                                'assigned_to' => ['type' => 'integer', 'example' => 1],
                                                 'created_at' => ['type' => 'string', 'format' => 'date-time'],
                                                 'updated_at' => ['type' => 'string', 'format' => 'date-time']
                                             ]
@@ -281,7 +283,7 @@ class DocumentationController extends Controller
                                                 'description' => ['type' => 'string', 'example' => 'This is a test task created via API'],
                                                 'status' => ['type' => 'string', 'example' => 'pending'],
                                                 'user_id' => ['type' => 'integer', 'example' => 1],
-                                                'assigned_to' => ['type' => 'integer', 'example' => 15],
+                                                'assigned_to' => ['type' => 'integer', 'example' => 1],
                                                 'created_at' => ['type' => 'string', 'format' => 'date-time'],
                                                 'updated_at' => ['type' => 'string', 'format' => 'date-time']
                                             ]
@@ -393,7 +395,7 @@ class DocumentationController extends Controller
                                                     'description' => ['type' => 'string', 'example' => 'This is a test task created via API'],
                                                     'status' => ['type' => 'string', 'example' => 'pending'],
                                                     'user_id' => ['type' => 'integer', 'example' => 1],
-                                                    'assigned_to' => ['type' => 'integer', 'example' => 15],
+                                                    'assigned_to' => ['type' => 'integer', 'example' => 1],
                                                     'created_at' => ['type' => 'string', 'format' => 'date-time'],
                                                     'updated_at' => ['type' => 'string', 'format' => 'date-time']
                                                 ]
@@ -425,7 +427,7 @@ class DocumentationController extends Controller
                                                     'description' => ['type' => 'string', 'example' => 'This is a test task created via API'],
                                                     'status' => ['type' => 'string', 'example' => 'pending'],
                                                     'user_id' => ['type' => 'integer', 'example' => 1],
-                                                    'assigned_to' => ['type' => 'integer', 'example' => 15],
+                                                    'assigned_to' => ['type' => 'integer', 'example' => 1],
                                                     'created_at' => ['type' => 'string', 'format' => 'date-time'],
                                                     'updated_at' => ['type' => 'string', 'format' => 'date-time']
                                                 ]

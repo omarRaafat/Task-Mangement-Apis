@@ -11,7 +11,7 @@ class TaskRepository implements TaskRepositoryInterface
     public function all(): LengthAwarePaginator
     {
         return Cache::remember('tasks.all', 60, function () {
-            return Task::with(['user', 'assignee'])->paginate(10);
+            return Task::where('user_id', auth()->id())->with(['user', 'assignee'])->paginate(10);
         });
     }
 
@@ -26,7 +26,9 @@ class TaskRepository implements TaskRepositoryInterface
     {
         $task = Task::create($data);
         Cache::forget('tasks.all');
-        Cache::forget("tasks.assigned.{$data['assigned_to']}");
+        if (isset($data['assigned_to'])) {
+            Cache::forget("tasks.assigned.{$data['assigned_to']}");
+        }
         return $task;
     }
 
