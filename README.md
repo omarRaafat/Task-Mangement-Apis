@@ -26,7 +26,7 @@ A robust Laravel-based REST API for comprehensive task management with advanced 
 
 - **PHP 8.2+** with extensions: BCMath, Ctype, cURL, DOM, Fileinfo, JSON, Mbstring, OpenSSL, PCRE, PDO, Tokenizer, XML
 - **Composer** 2.0+
-- **MySQL** 8.0+ or **MariaDB** 10.3+
+- **MySQL** 8.0+
 - **Redis** 6.0+ (optional, for caching and queues)
 - **Git** for version control
 
@@ -36,7 +36,7 @@ A robust Laravel-based REST API for comprehensive task management with advanced 
 
 ```bash
 # Clone the repository
-git clone <your-repo-url> Task-Management-App
+git clone https://github.com/omarRaafat/Task-Mangement-Apis.git
 cd Task-Management-App
 
 # Install PHP dependencies
@@ -61,7 +61,7 @@ php artisan key:generate
    php artisan migrate --seed
    ```
 
-### **🏃‍♂️ Running the Application**
+### ** Running the Application**
 
 ```bash
 # Start the development server
@@ -75,28 +75,16 @@ php artisan queue:work
 
 ## ⚙️ Environment Configuration
 
-### **📝 Required Environment Variables**
+### ** Required Environment Variables**
 
-Create a `.env` file in the project root with the following configuration:
+In `.env` file in the project root with the following configuration:
 
 ```env
 # Application Settings
-APP_NAME="Task Management API"
-APP_ENV=local
-APP_KEY=base64:your-generated-key-here
-APP_DEBUG=true
-APP_URL=http://127.0.0.1:8000
 
 # Logging
 LOG_CHANNEL=stack
 
-# Database Configuration (MySQL)
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=task_management_db
-DB_USERNAME=your_mysql_username
-DB_PASSWORD=your_mysql_password
 
 # Cache Configuration
 CACHE_DRIVER=redis
@@ -114,37 +102,15 @@ REDIS_HOST=127.0.0.1
 REDIS_PASSWORD=null
 REDIS_PORT=6379
 
-# Mail Configuration (for notifications)
-MAIL_MAILER=smtp
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=your-email@gmail.com
-MAIL_PASSWORD=your-app-password
-MAIL_ENCRYPTION=tls
-MAIL_FROM_ADDRESS="noreply@taskmanagement.com"
-MAIL_FROM_NAME="Task Management System"
+# Mail Configuration (for notifications) LIKE .ENV.EXAMPLE
+
 
 # Sanctum Configuration
 SANCTUM_STATEFUL_DOMAINS=localhost,127.0.0.1,127.0.0.1:8000,::1
 ```
 
-### **🔧 Alternative Configuration (File-based)**
 
-If you prefer file-based caching and database queues (no Redis required):
-
-```env
-# Cache & Queue (File-based)
-CACHE_DRIVER=file
-QUEUE_CONNECTION=database
-SESSION_DRIVER=file
-
-# Mail (Log-based for development)
-MAIL_MAILER=log
-MAIL_FROM_ADDRESS="noreply@taskmanagement.com"
-MAIL_FROM_NAME="Task Management System"
-```
-
-## 🏃‍♂️ Running the Application
+##  Running the Application
 
 ### **📋 Pre-flight Checklist**
 
@@ -195,33 +161,6 @@ The API uses **Laravel Sanctum** for token-based authentication. All protected r
 | `GET` | `/api/user` | Get current user profile | ✅ Yes |
 | `POST` | `/api/logout` | Logout and revoke token | ✅ Yes |
 
-### ** Example Usage (PowerShell)**
-
-```powershell
-# 1. Register a new user
-$registerBody = @{
-    name = "Test User"
-    email = "test@example.com"
-    password = "Password123!"
-} | ConvertTo-Json
-
-$registerResponse = Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:8000/api/register" -ContentType 'application/json' -Body $registerBody
-
-# 2. Login with credentials
-$loginBody = @{
-    email = "admin@example.com"
-    password = "Password123!"
-} | ConvertTo-Json
-
-$loginResponse = Invoke-RestMethod -Method Post -Uri "http://127.0.0.1:8000/api/login" -ContentType 'application/json' -Body $loginBody
-
-# 3. Extract access token
-$accessToken = $loginResponse.access_token
-
-# 4. Use token for protected endpoints
-$headers = @{ Authorization = "Bearer $accessToken" }
-$tasks = Invoke-RestMethod -Method Get -Uri "http://127.0.0.1:8000/api/tasks" -Headers $headers
-```
 
 ## API Overview
 
@@ -274,73 +213,16 @@ The API uses Laravel's queue system for background job processing:
 
 ### **📨 Email Configuration**
 
-#### **Development (Log-based)**
+#### **Development (Log-based) Using my GMAIL APP PASSWORD **
 ```env
 MAIL_MAILER=log
 MAIL_FROM_ADDRESS="noreply@taskmanagement.com"
 MAIL_FROM_NAME="Task Management System"
 ```
 
-#### **Production (SMTP)**
-```env
-MAIL_MAILER=smtp
-MAIL_HOST=smtp.gmail.com
-MAIL_PORT=587
-MAIL_USERNAME=your-email@gmail.com
-MAIL_PASSWORD=your-app-password
-MAIL_ENCRYPTION=tls
-```
-
-### ** Queue Commands**
-
-```bash
-# Process all queued jobs
-php artisan queue:work
-
-# Process jobs with specific connection
-php artisan queue:work redis
-
-# Process failed jobs
-php artisan queue:retry all
-
-# Clear all failed jobs
-php artisan queue:flush
-```
-
 ## 🧪 **API Testing**
 
 ### ** Quick Testing with Postman**
-
-#### **📥 Import the Postman Collection:**
-
-1. **Download the collection file:**
-   ```bash
-   # From the project root
-   curl -o Task-Management-API.postman_collection.json https://raw.githubusercontent.com/yourusername/task-management-api/main/docs/Task-Management-API.postman_collection.json
-   ```
-
-2. **Import into Postman:**
-   - Open Postman
-   - Click **Import** button
-   - Select the `Task-Management-API.postman_collection.json` file
-   - Click **Import**
-
-3. **Set Environment Variables:**
-   - Create a new environment in Postman
-   - Add variable: `baseUrl` = `http://127.0.0.1:8000/api`
-   - Save the environment
-
-4. **Test Credentials (Ready to Use):**
-   - **Admin**: `admin@example.com` / `Password123!`
-   - **User**: `user@example.com` / `Password123!`
-   - **Manager**: `manager@example.com` / `Password123!`
-
-#### **🎯 Testing Flow:**
-1. **Register** → **Login** → **Get Token** → **Test Protected Endpoints**
-2. All requests are pre-configured with proper headers and examples
-3. Token is automatically saved and used for authenticated requests
-
----
 
 ### **🌐 Interactive Swagger UI Testing**
 
@@ -364,21 +246,22 @@ php artisan queue:flush
 6. **Enter:** `Bearer YOUR_ACCESS_TOKEN`
 7. **Test all protected endpoints** with the "Try it out" button
 
-#### **📋 Test Data Examples:**
-```json
-// Registration
-{
-  "name": "Test User",
-  "email": "test@example.com", 
-  "password": "Password123!"
-}
+---
 
-// Login
-{
-  "email": "admin@example.com",
-  "password": "Password123!"
-}
-```
+#### **📥 Import the Postman Collection:**
+
+1. **Download the collection file:**
+   ```bash
+   # From the project root
+   curl -o Task-Management-API.postman_collection.json https://raw.githubusercontent.com/yourusername/task-management-api/main/docs/Task-Management-API.postman_collection.json
+   ```
+
+2. **Import into Postman:**
+   - Open Postman
+   - Click **Import** button
+   - Select the `Task-Management-API.postman_collection.json` file
+   - Click **Import**
+
 
 ---
 
