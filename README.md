@@ -251,7 +251,7 @@ MAIL_FROM_NAME="Task Management System"
 1. **Download the collection file:**
    ```bash
    # From the project root
-   curl -o Task-Management-API.postman_collection.json https://raw.githubusercontent.com/yourusername/task-management-api/main/docs/Task-Management-API.postman_collection.json
+     Task Management System API.postman_collection.json
    ```
 
 2. **Import into Postman:**

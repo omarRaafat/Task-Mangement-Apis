@@ -182,7 +182,7 @@ class DocumentationController extends Controller
                 '/api/tasks' => [
                     'get' => [
                         'tags' => ['Tasks'],
-                        'summary' => 'Get all tasks',
+                        'summary' => 'Get tasks created by authenticated user',
                         'responses' => [
                             '200' => [
                                 'description' => 'List of tasks',
@@ -297,7 +297,7 @@ class DocumentationController extends Controller
                     ],
                     'put' => [
                         'tags' => ['Tasks'],
-                        'summary' => 'Update a task',
+                        'summary' => 'Update task info or assign to another',
                         'parameters' => [
                             [
                                 'name' => 'id',
@@ -379,7 +379,7 @@ class DocumentationController extends Controller
                 '/api/my-tasks' => [
                     'get' => [
                         'tags' => ['Tasks'],
-                        'summary' => 'Get tasks created by authenticated user',
+                        'summary' => 'Get tasks created or assigned to me',
                         'responses' => [
                             '200' => [
                                 'description' => 'List of user\'s tasks',
