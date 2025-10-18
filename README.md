@@ -222,8 +222,6 @@ MAIL_FROM_NAME="Task Management System"
 
 ## 🧪 **API Testing**
 
-### ** Quick Testing with Postman**
-
 ### **🌐 Interactive Swagger UI Testing**
 
 #### **📖 Access Swagger Documentation:**
@@ -247,7 +245,7 @@ MAIL_FROM_NAME="Task Management System"
 7. **Test all protected endpoints** with the "Try it out" button
 
 ---
-
+### ** Quick Testing with Postman**
 #### **📥 Import the Postman Collection:**
 
 1. **Download the collection file:**
