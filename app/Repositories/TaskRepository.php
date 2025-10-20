@@ -22,7 +22,6 @@ class TaskRepository implements TaskRepositoryInterface
         $perPage = request('per_page', 10);
         
         $cacheKey = "{$this->getCachePrefix()}.user.{$userId}.page.{$page}.per_page.{$perPage}";
-        $this->clearListCaches();
         return Cache::tags([$this->getUserTag($userId), $this->getListTag()])
         ->remember($cacheKey, self::CACHE_TTL, function () use ($userId, $perPage) {
             $tasks = Task::with(['user:id,name,email', 'assignee:id,name,email'])
