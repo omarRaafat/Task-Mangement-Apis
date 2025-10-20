@@ -5,6 +5,7 @@ use App\Models\Task;
 use App\Repositories\TaskRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 class TaskService
 {
     public function __construct(
@@ -12,7 +13,7 @@ class TaskService
         private TaskAuthorizationService $authService
     ) {}
 
-    public function getUserTasks(): LengthAwarePaginator
+    public function getUserTasks(): LengthAwarePaginator|JsonResource
     {
         
         $userTasks = $this->taskRepository->getUserTasks(auth()->id());
@@ -21,7 +22,7 @@ class TaskService
         return $userTasks;
     }
 
-    public function getAssignedTasks(): LengthAwarePaginator
+    public function getAssignedTasks(): LengthAwarePaginator|JsonResource
     {
         $assignedTasks = $this->taskRepository->getAssignedTasks(auth()->id());
         $this->authService->authorize('view-any', $assignedTasks);
@@ -77,7 +78,7 @@ class TaskService
         return $this->taskRepository->delete($taskId);
     }
 
-    public function getAllTasks(): LengthAwarePaginator
+    public function getAllTasks(): LengthAwarePaginator|JsonResource
     {
         $this->authService->authorize('view-any', Task::class);
         

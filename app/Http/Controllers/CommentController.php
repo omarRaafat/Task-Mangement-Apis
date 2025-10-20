@@ -5,9 +5,10 @@ use App\Http\Requests\CommentRequest;
 use App\Services\CommentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
-
+use App\Traits\ResponseTrait;
 class CommentController extends Controller
 {
+    use ResponseTrait;
     public function __construct(private CommentService $commentService)
     {
         $this->middleware('auth:sanctum');
@@ -17,11 +18,11 @@ class CommentController extends Controller
     {
         try {
             $comments = $this->commentService->getTaskComments($taskId);
-            return response()->json($comments);
+            return $this->successResponse($comments);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['message' => 'Task not found'], 404);
+            return $this->notFoundResponse('Task not found');
         } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return $this->unauthorizedResponse();
         }
     }
 
@@ -29,11 +30,11 @@ class CommentController extends Controller
     {
         try {
             $comment = $this->commentService->createComment($taskId, $request->validated());
-            return response()->json($comment, 201);
+            return $this->successResponse($comment, 'Comment created', 201);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['message' => 'Task not found'], 404);
+            return $this->notFoundResponse('Task not found');
         } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return $this->unauthorizedResponse();
         }
     }
 
@@ -42,13 +43,13 @@ class CommentController extends Controller
         try {
         $result = $this->commentService->updateComment($taskId, $commentId, $request->validated());
         if (!$result) {
-            return response()->json(['message' => 'Comment not found'], 404);
+            return $this->notFoundResponse('Comment not found');
         }
-        return response()->json(['message' => 'Comment updated successfully']);
+        return $this->successResponse(null, 'Comment updated successfully');
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return response()->json(['message' => 'Task not found'], 404);
+            return $this->notFoundResponse('Task not found');
         } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+            return $this->unauthorizedResponse();
         }
     }
 
@@ -57,10 +58,10 @@ class CommentController extends Controller
         $result = $this->commentService->deleteComment($taskId, $commentId);
         
         if (!$result) {
-            return response()->json(['message' => 'Comment not found'], 404);
+            return $this->notFoundResponse('Comment not found');
         }
 
-        return response()->json(['message' => 'Comment deleted successfully']);
+        return $this->successResponse(null, 'Comment deleted successfully');
     }
 
     public function show(int $taskId, int $commentId): JsonResponse
@@ -68,9 +69,9 @@ class CommentController extends Controller
         $comment = $this->commentService->getCommentForTask($taskId, $commentId);
         
         if (!$comment) {
-            return response()->json(['message' => 'Comment not found'], 404);
+            return $this->notFoundResponse('Comment not found');
         }
 
-        return response()->json($comment);
+        return $this->successResponse($comment);
     }
 }

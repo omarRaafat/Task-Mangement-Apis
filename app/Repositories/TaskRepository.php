@@ -6,14 +6,16 @@ use App\Repositories\Contracts\TaskRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use App\Http\Resources\TaskResource;
+use App\Http\Resources\TaskCollection;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class TaskRepository implements TaskRepositoryInterface
 {
     protected const CACHE_TTL = 3600; // 1 hour in seconds
     protected const CACHE_PREFIX = 'tasks';
 
-    public function all(): LengthAwarePaginator
+    public function all(): LengthAwarePaginator|JsonResource
     {
         $userId = auth()->id();
         $page = request('page', 1);
@@ -22,10 +24,13 @@ class TaskRepository implements TaskRepositoryInterface
         $cacheKey = "{$this->getCachePrefix()}.user.{$userId}.page.{$page}.per_page.{$perPage}";
         $this->clearListCaches();
         return Cache::tags([$this->getUserTag($userId), $this->getListTag()])
-            ->remember($cacheKey, self::CACHE_TTL, function () use ($userId, $perPage) {
-                return Task::select(['id' , 'title', 'description' , 'status' , 'due_date' , 'created_at' , 'user_id', 'assigned_to'])->whereUserId($userId)
-                    ->with(['user', 'assignee'])
-                    ->paginate($perPage);
+        ->remember($cacheKey, self::CACHE_TTL, function () use ($userId, $perPage) {
+            $tasks = Task::with(['user:id,name,email', 'assignee:id,name,email'])
+                ->whereUserId($userId)
+                ->select(['id', 'title', 'description', 'status', 'due_date', 'created_at', 'user_id', 'assigned_to'])
+                ->paginate($perPage);
+                
+                return new TaskCollection($tasks);
             });
     }
 
@@ -102,7 +107,7 @@ class TaskRepository implements TaskRepositoryInterface
         return $result;
     }
 
-    public function getUserTasks(int $userId): LengthAwarePaginator
+    public function getUserTasks(int $userId): LengthAwarePaginator|JsonResource
     {
         $page = request('page', 1);
         $perPage = request('per_page', 10);
@@ -111,14 +116,17 @@ class TaskRepository implements TaskRepositoryInterface
         
         return Cache::tags([$this->getUserTag($userId), $this->getListTag()])
             ->remember($cacheKey, self::CACHE_TTL, function () use ($userId, $perPage) {
-                return Task::whereUserId($userId)
+                    $tasks = Task::with(['user:id,name,email', 'assignee:id,name,email'])
+                    ->whereUserId($userId)
                     ->orWhere('assigned_to',$userId)
-                    ->with(['user', 'assignee'])
+                    ->select(['id', 'title', 'description', 'status', 'due_date', 'created_at', 'user_id', 'assigned_to'])
                     ->paginate($perPage);
+                    
+                return new TaskCollection($tasks);
             });
     }
 
-    public function getAssignedTasks(int $userId): LengthAwarePaginator
+    public function getAssignedTasks(int $userId): LengthAwarePaginator|JsonResource
     {
         $page = request('page', 1);
         $perPage = request('per_page', 10);

@@ -5,8 +5,10 @@ use App\Services\TaskService;
 use Illuminate\Http\JsonResponse;
 use App\Http\Requests\TaskRequest;
 use Illuminate\Routing\Controller;
+use App\Traits\ResponseTrait;
 class TaskController extends Controller
 {
+    use ResponseTrait;
     public function __construct(private TaskService $taskService) {
         $this->middleware('auth:sanctum');
     }
@@ -15,13 +17,16 @@ class TaskController extends Controller
     {
       
         $tasks = $this->taskService->getAllTasks();
-        return response()->json($tasks);
+        if ($tasks instanceof AnonymousResourceCollection) {
+            return $this->successResponse($tasks);
+        }
+        return $this->successResponse($tasks);
     }
 
     public function assigned(): JsonResponse
     {
         $tasks = $this->taskService->getAssignedTasks();
-        return response()->json($tasks);
+        return $this->successResponse($tasks);
     }
 
     public function show(int $id): JsonResponse
@@ -32,7 +37,7 @@ class TaskController extends Controller
             return response()->json(['message' => 'Task not found'], 404);
         }
 
-        return response()->json($task);
+        return $this->successResponse($task);
     }
 
     public function store(TaskRequest $request): JsonResponse
@@ -40,7 +45,7 @@ class TaskController extends Controller
 
         $task = $this->taskService->createTask($request->validated());
         
-        return response()->json($task, 201);
+       return $this->successResponse($task , 'New Task Created',201);
     }
 
     public function update(TaskRequest $request, int $id): JsonResponse
@@ -49,10 +54,10 @@ class TaskController extends Controller
         $result = $this->taskService->updateTask($id, $request->validated());
         
         if (!$result) {
-            return response()->json(['message' => 'Task not found'], 404);
+            return $this->notFoundResponse('Task not found');
         }
 
-        return response()->json(['message' => 'Task updated successfully']);
+        return $this->successResponse(null, 'Task updated successfully');
     }
 
     public function destroy(int $id): JsonResponse
@@ -60,21 +65,21 @@ class TaskController extends Controller
         $result = $this->taskService->deleteTask($id);
         
         if (!$result) {
-            return response()->json(['message' => 'Task not found'], 404);
+            return $this->notFoundResponse('Task not found');
         }
 
-        return response()->json(['message' => 'Task deleted successfully']);
+        return $this->successResponse(null, 'Task deleted successfully');
     }
     public function myTasks(): JsonResponse
     {
         $tasks = $this->taskService->getUserTasks();
-        return response()->json($tasks);
+        return $this->successResponse($tasks);
     }
 
     public function assignedTasks(): JsonResponse
     {
         $tasks = $this->taskService->getAssignedTasks();
-        return response()->json($tasks);
+        return $this->successResponse($tasks);
     }
     
 }
