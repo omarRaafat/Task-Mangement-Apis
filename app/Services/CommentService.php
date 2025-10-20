@@ -7,7 +7,7 @@ use App\Models\Task;
 use App\Repositories\CommentRepository;
 use App\Repositories\TaskRepository;
 use Illuminate\Database\Eloquent\Collection;
-
+use Illuminate\Http\Resources\Json\JsonResource;
 class CommentService
 {
     public function __construct(
@@ -16,7 +16,7 @@ class CommentService
         private CommentAuthorizationService $authService
     ) {}
 
-    public function getTaskComments(int $taskId): Collection
+    public function getTaskComments(int $taskId): JsonResource
     {
         $task = $this->taskRepository->find($taskId);
         

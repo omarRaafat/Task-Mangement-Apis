@@ -27,7 +27,7 @@ class TaskRequest extends FormRequest
             'description' => 'required|string',
             'status' => 'required|in:pending,in-progress,completed',
             'due_date' => 'required|date|after:today',
-            'assigned_to' => 'sometimes|exists:users,id',
+            'assigned_to' => 'nullable|exists:users,id',
         ];
     
         // For update, make fields optional

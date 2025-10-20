@@ -4,7 +4,7 @@ namespace App\Services;
 use App\Models\Task;
 use App\Repositories\TaskRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
-
+use Illuminate\Http\Resources\Json\JsonResource;
 class TaskService
 {
     public function __construct(
@@ -41,7 +41,7 @@ class TaskService
         return $task;
     }
 
-    public function createTask(array $data): Task
+    public function createTask(array $data): JsonResource
     {
         $this->authService->authorize('create', Task::class);
         

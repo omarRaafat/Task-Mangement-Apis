@@ -5,16 +5,18 @@ use App\Models\Comment;
 use App\Repositories\Contracts\CommentRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
-
+use App\Http\Resources\CommentResource;
+use Illuminate\Http\Resources\Json\JsonResource;
 class CommentRepository implements CommentRepositoryInterface
 {
-    public function getTaskComments(int $taskId): Collection
+    public function getTaskComments(int $taskId): JsonResource
     {
+        $this->clearTaskCommentsCache($taskId);
         return Cache::remember("tasks.{$taskId}.comments", 3600, function () use ($taskId) {
-            return Comment::where('task_id', $taskId)
+            return CommentResource::collection(Comment::where('task_id', $taskId)
                 ->with('user')
                 ->orderBy('created_at', 'desc')
-                ->get();
+                ->get());
         });
     }
 

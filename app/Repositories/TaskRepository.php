@@ -5,6 +5,8 @@ use App\Models\Task;
 use App\Repositories\Contracts\TaskRepositoryInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
+use App\Http\Resources\TaskResource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class TaskRepository implements TaskRepositoryInterface
 {
@@ -18,10 +20,10 @@ class TaskRepository implements TaskRepositoryInterface
         $perPage = request('per_page', 10);
         
         $cacheKey = "{$this->getCachePrefix()}.user.{$userId}.page.{$page}.per_page.{$perPage}";
-        
+        $this->clearListCaches();
         return Cache::tags([$this->getUserTag($userId), $this->getListTag()])
             ->remember($cacheKey, self::CACHE_TTL, function () use ($userId, $perPage) {
-                return Task::where('user_id', $userId)
+                return Task::select(['id' , 'title', 'description' , 'status' , 'due_date' , 'created_at' , 'user_id', 'assigned_to'])->whereUserId($userId)
                     ->with(['user', 'assignee'])
                     ->paginate($perPage);
             });
@@ -38,7 +40,7 @@ class TaskRepository implements TaskRepositoryInterface
             });
     }
 
-    public function create(array $data): Task
+    public function create(array $data): JsonResource
     {
         $task = Task::create($data);
         $this->clearUserCaches($task->user_id);
@@ -50,7 +52,7 @@ class TaskRepository implements TaskRepositoryInterface
         // Clear general list caches
         $this->clearListCaches();
         
-        return $task;
+        return TaskResource::make($task);
     }
 
     public function update(int $id, array $data): bool
@@ -109,8 +111,8 @@ class TaskRepository implements TaskRepositoryInterface
         
         return Cache::tags([$this->getUserTag($userId), $this->getListTag()])
             ->remember($cacheKey, self::CACHE_TTL, function () use ($userId, $perPage) {
-                return Task::where('user_id', $userId)
-                    ->orWhere('assigned_to', $userId)
+                return Task::whereUserId($userId)
+                    ->orWhere('assigned_to',$userId)
                     ->with(['user', 'assignee'])
                     ->paginate($perPage);
             });
@@ -125,7 +127,7 @@ class TaskRepository implements TaskRepositoryInterface
         
         return Cache::tags([$this->getUserTag($userId), $this->getListTag()])
             ->remember($cacheKey, self::CACHE_TTL, function () use ($userId, $perPage) {
-                return Task::where('assigned_to', $userId)
+                return Task::whereAssignedTo($userId)
                     ->with(['user', 'assignee'])
                     ->paginate($perPage);
             });
