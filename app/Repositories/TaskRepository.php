@@ -31,8 +31,8 @@ class TaskRepository implements TaskRepositoryInterface
 
     public function find(int $id): ?Task
     {
-        $cacheKey = "{$this->getCachePrefix()}.{$id}";
-        
+        $cacheKey = "{$this->getCachePrefix()}.tasks.{$id}";
+        $this->clearTaskCache($id);
         return Cache::tags([$this->getTaskTag($id), $this->getListTag()])
             ->remember($cacheKey, self::CACHE_TTL, function () use ($id) {
                 return Task::with(['user', 'assignee', 'comments.user'])
@@ -66,7 +66,7 @@ class TaskRepository implements TaskRepositoryInterface
         if ($result) {
             $this->clearTaskCache($id);
             $this->clearUserCaches($oldUserId);
-            $this->clearUserCaches($oldAssignedTo);
+            $oldAssignedTo && $this->clearUserCaches($oldAssignedTo);
             
             // Clear for new assignee if changed
             if (isset($data['assigned_to']) && $data['assigned_to'] != $oldAssignedTo) {

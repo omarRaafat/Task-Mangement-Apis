@@ -35,6 +35,7 @@ class TaskRequest extends FormRequest
             $rules['title'] = 'sometimes|string|max:255';
             $rules['description'] = 'sometimes|string';
             $rules['due_date'] = 'sometimes|date|after:today';
+            $rules['status'] = 'sometimes|in:pending,in-progress,completed';
             $rules['assigned_to'] = 'sometimes|exists:users,id';
         }
     
